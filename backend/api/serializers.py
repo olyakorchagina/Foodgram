@@ -1,5 +1,6 @@
+from recipes.models import Ingredient, Tag
 from rest_framework import serializers
-from users.models import Subscription, User
+from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -29,3 +30,26 @@ class UserSerializer(serializers.ModelSerializer):
 class SetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True)
     current_password = serializers.CharField(required=True)
+
+
+class TagSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Tag
+        fields = (
+            'id',
+            'name',
+            'color',
+            'slug',
+        )
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ingredient
+        fields = (
+            'id',
+            'name',
+            'measurement_unit',
+        )
