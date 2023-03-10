@@ -1,7 +1,7 @@
-from api.mixins import CreateListRetrieveViewSet
+from api.mixins import CreateDestroyViewSet, CreateListRetrieveViewSet
 from api.serializers import (IngredientSerializer, RecipeSerializer,
-                             SetPasswordSerializer, TagSerializer,
-                             UserSerializer)
+                             SetPasswordSerializer, SubscriptionSerializer,
+                             TagSerializer, UserSerializer)
 from recipes.models import Ingredient, Recipe, Tag
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -20,9 +20,8 @@ class PageLimitPaginator(PageNumberPagination):
 class UserViewSet(CreateListRetrieveViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    #permission_classes
+    permission_classes = (AllowAny,)
     pagination_class = PageLimitPaginator
-
 
     @action(
         detail=False,
@@ -49,23 +48,25 @@ class UserViewSet(CreateListRetrieveViewSet):
             user.set_password(new_password)
             user.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    #@action(
-    #    detail=False,
-    #    methods=['GET'],
-    #    permission_classes=(IsAuthenticated,)
-    #)
-    #def subscriptions(self, request):
-    #    pass
+    @action(
+        detail=False,
+        methods=['GET'],
+        permission_classes=(IsAuthenticated,)
+    )
+    def subscriptions(self, request):
+        queryset = self.get_queryset().filter(
+            subscribers__subscriber=request.user
+        ).order_by('pk')
+        serializer = SubscriptionSerializer(
+            queryset, many=True, context={'request': request}
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    #@action(
-    #    detail=True,
-    #    methods=['POST', 'DELETE'],
-    #    permission_classes=(IsAuthenticated,)
-    #)
-    #def subscribe(self, request, pk):
 
+class Subscription(CreateDestroyViewSet):
+    pass
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
@@ -77,7 +78,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
 
 
-class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
+class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = (AllowAny,)
