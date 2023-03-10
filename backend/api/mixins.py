@@ -6,3 +6,10 @@ class CreateListRetrieveViewSet(mixins.CreateModelMixin,
                                 mixins.RetrieveModelMixin,
                                 viewsets.GenericViewSet):
     pass
+
+
+class CreateUpdateDestroyViewSet(mixins.CreateModelMixin,
+                                mixins.UpdateModelMixin,
+                                mixins.DestroyModelMixin,
+                                viewsets.GenericViewSet):
+    pass

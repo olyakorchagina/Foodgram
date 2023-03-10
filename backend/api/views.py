@@ -1,11 +1,12 @@
 from api.mixins import CreateListRetrieveViewSet
-from api.serializers import (IngredientSerializer, SetPasswordSerializer,
-                             TagSerializer, UserSerializer)
-from recipes.models import Ingredient, Tag
+from api.serializers import (IngredientSerializer, RecipeSerializer,
+                             SetPasswordSerializer, TagSerializer,
+                             UserSerializer)
+from recipes.models import Ingredient, Recipe, Tag
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from users.models import User
 
@@ -74,3 +75,10 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+
+
+class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    permission_classes = (AllowAny,)
+    pagination_class = PageLimitPaginator
