@@ -71,3 +71,6 @@ class Subscription(models.Model):
                 name='unique_subscribtion'
             )
         ]
+
+    def __str__(self):
+        return self.subscriber.username
