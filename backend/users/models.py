@@ -64,7 +64,7 @@ class Subscription(models.Model):
         constraints = [
             models.CheckConstraint(
                 check=~models.Q(subscriber=models.F('target')),
-                name='Вы не можете подписаться на себя'
+                name='no_self_subscription'
             ),
             models.UniqueConstraint(
                 fields=['subscriber', 'target'],
@@ -73,4 +73,4 @@ class Subscription(models.Model):
         ]
 
     def __str__(self):
-        return self.subscriber.username
+        return f'{self.subscriber} подписан на {self.target}'
