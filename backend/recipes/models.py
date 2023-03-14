@@ -116,20 +116,16 @@ class RecipeIngredient(models.Model):
     amount = models.PositiveIntegerField(
         verbose_name='Количество',
         validators=[
-        MinValueValidator(
-            MIN_INGREDIENT_AMOUNT,
-            f'Минимальное значение: {MIN_INGREDIENT_AMOUNT}')
+            MinValueValidator(
+                MIN_INGREDIENT_AMOUNT,
+                f'Минимальное значение: {MIN_INGREDIENT_AMOUNT}'
+            )
         ],
     )
 
     class Meta:
         verbose_name = 'Количество ингредиента в рецептe'
         verbose_name_plural = 'Количество ингредиентов в рецептах'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['recipe', 'ingredient'],
-                name='unique_recipe_ingredient')
-        ]
 
     def __str__(self):
         return f'{self.ingredient.name} - {self.amount}'
