@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from users.models import Subscription, User
 
 
@@ -36,6 +37,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         'target',
     )
     empty_value_display = '-пусто-'
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Subscription, SubscriptionAdmin)

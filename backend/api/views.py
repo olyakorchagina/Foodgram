@@ -1,19 +1,22 @@
+from django.db.models import Sum
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from api.filters import IngredientFilter, TagFilter
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (CreateRecipeSerializer, FavoriteSerializer,
                              IngredientSerializer, RecipeSerializer,
                              ShoppingCartSerializer, SubscriptionSerializer,
                              TagSerializer, UserSerializer)
-from django.db.models import Sum
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
 from users.models import Subscription, User
 
 
@@ -26,7 +29,6 @@ class PageLimitPaginator(PageNumberPagination):
 class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (AllowAny, )
     pagination_class = PageLimitPaginator
 
     @action(
@@ -84,6 +86,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -91,6 +94,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = CreateRecipeSerializer
     permission_classes = (IsAuthorOrReadOnly,)
     pagination_class = PageLimitPaginator
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TagFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

@@ -53,7 +53,7 @@ class Subscription(models.Model):
     )
     target = models.ForeignKey(
         User,
-        verbose_name = 'Объект подписки',
+        verbose_name='Объект подписки',
         on_delete=models.CASCADE,
         related_name='subscribers',
     )

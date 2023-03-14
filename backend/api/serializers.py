@@ -1,13 +1,13 @@
 import base64
 
 from django.core.files.base import ContentFile
-from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from recipes.models import (MIN_COOK_TIME, MIN_INGREDIENT_AMOUNT, Favorite,
-                            Ingredient, Recipe, RecipeIngredient, ShoppingCart,
-                            Tag)
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
+
+from recipes.models import (Favorite, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCart,
+                            Tag, MIN_COOK_TIME, MIN_INGREDIENT_AMOUNT,)
 from users.models import Subscription, User
 
 
@@ -225,7 +225,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             ingredients_list.append(ingredient['id'])
             if int(ingredient.get('amount')) < MIN_INGREDIENT_AMOUNT:
                 raise serializers.ValidationError(
-                    f'Количество ингредиента не меньше {MIN_INGREDIENT_AMOUNT}')
+                    f'Кол-во ингредиента не меньше {MIN_INGREDIENT_AMOUNT}')
         return ingredients
 
     def validate_tags(self, tags):
