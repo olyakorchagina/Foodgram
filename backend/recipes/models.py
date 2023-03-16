@@ -1,10 +1,8 @@
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 
 from users.models import User
-
-MIN_COOK_TIME = 1
-MIN_INGREDIENT_AMOUNT = 1
 
 
 class Tag(models.Model):
@@ -81,8 +79,8 @@ class Recipe(models.Model):
         verbose_name='Время приготовления (в минутах)',
         validators=[
             MinValueValidator(
-                MIN_COOK_TIME,
-                f'Минимальное значение: {MIN_COOK_TIME} минута'
+                settings.MIN_COOK_TIME,
+                f'Минимальное значение: {settings.MIN_COOK_TIME}'
             )
         ],
     )
@@ -118,8 +116,8 @@ class RecipeIngredient(models.Model):
         verbose_name='Количество',
         validators=[
             MinValueValidator(
-                MIN_INGREDIENT_AMOUNT,
-                f'Минимальное значение: {MIN_INGREDIENT_AMOUNT}'
+                settings.MIN_INGREDIENT_AMOUNT,
+                f'Минимальное значение: {settings.MIN_INGREDIENT_AMOUNT}'
             )
         ],
     )

@@ -1,13 +1,13 @@
 import base64
 
+from django.conf import settings
 from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
 
-from recipes.models import (Favorite, Ingredient, Recipe,
-                            RecipeIngredient, ShoppingCart,
-                            Tag, MIN_COOK_TIME, MIN_INGREDIENT_AMOUNT,)
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
 from users.models import Subscription, User
 
 
@@ -223,9 +223,11 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'Ингридиенты должны быть уникальными')
             ingredients_list.append(ingredient['id'])
-            if int(ingredient.get('amount')) < MIN_INGREDIENT_AMOUNT:
+            if int(ingredient.get('amount')) < settings.MIN_INGREDIENT_AMOUNT:
                 raise serializers.ValidationError(
-                    f'Кол-во ингредиента не меньше {MIN_INGREDIENT_AMOUNT}')
+                    f'Количество ингредиента не может быть меньше '
+                    f'{settings.MIN_INGREDIENT_AMOUNT}'
+                )
         return ingredients
 
     def validate_tags(self, tags):
@@ -236,9 +238,11 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         return tags
 
     def validate_cooking_time(self, cooking_time):
-        if cooking_time < MIN_COOK_TIME:
+        if cooking_time < settings.MIN_COOK_TIME:
             raise serializers.ValidationError(
-                f'Время приготовления не меньше {MIN_COOK_TIME}')
+                f'Время приготовления не может быть меньше '
+                f'{settings.MIN_COOK_TIME}'
+            )
         return cooking_time
 
     def create_ingredients(self, recipe, ingredients):

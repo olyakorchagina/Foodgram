@@ -5,25 +5,18 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.filters import IngredientFilter, TagFilter
+from api.pagination import PageLimitPaginator
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (CreateRecipeSerializer, FavoriteSerializer,
                              IngredientSerializer, RecipeSerializer,
                              ShoppingCartSerializer, SubscriptionSerializer,
                              TagSerializer, UserSerializer)
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingCart, Tag)
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.models import Subscription, User
-
-
-class PageLimitPaginator(PageNumberPagination):
-    page_size = 6
-    page_size_query_param = 'limit'
-    max_page_size = 10
 
 
 class UserViewSet(UserViewSet):
@@ -72,10 +65,14 @@ class UserViewSet(UserViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            get_object_or_404(
-                Subscription, subscriber=subscriber, target=target
-            ).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            subscription = subscriber.subscriptions.filter(target=target)
+            if subscription.exists():
+                subscription.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {'error': 'Вы не были подписаны на этого пользователя'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -122,10 +119,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            get_object_or_404(
-                ShoppingCart, user=request.user.id, recipe=recipe
-            ).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            recipe_in_cart = recipe.shopping_carts.filter(user=request.user.id)
+            if recipe_in_cart.exists():
+                recipe_in_cart.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {'error': 'Этого рецепта не было в вашем списке покупок'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(
         detail=True,
@@ -147,10 +148,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            get_object_or_404(
-                Favorite, user=request.user.id, recipe=recipe
-            ).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            recipe_in_favorite = recipe.favorites.filter(user=request.user.id)
+            if recipe_in_favorite.exists():
+                recipe_in_favorite.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {'error': 'Этого рецепта не было в вашем избранном'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(
         detail=False,

@@ -126,3 +126,7 @@ DJOSER = {
 
     "HIDE_USERS": False,
 }
+
+MIN_COOK_TIME = 1
+
+MIN_INGREDIENT_AMOUNT = 1
