@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 from api.filters import IngredientFilter, TagFilter
 from api.pagination import PageLimitPaginator
-from api.permissions import IsAuthorOrReadOnly
+from api.permissions import IsAuthorOrAdminOrReadOnly
 from api.serializers import (CreateRecipeSerializer, FavoriteSerializer,
                              IngredientSerializer, RecipeSerializer,
                              ShoppingCartSerializer, SubscriptionSerializer,
@@ -89,7 +89,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = CreateRecipeSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrAdminOrReadOnly,)
     pagination_class = PageLimitPaginator
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TagFilter
