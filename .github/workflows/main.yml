@@ -66,9 +66,8 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
+          cd infra/
           sudo docker-compose down
-          sudo docker pull olyakorchagina/foodgram_frontend:latest
-          sudo docker pull olyakorchagina/foodgram_backend:latest
           touch .env
           echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
           echo DB_NAME=${{ secrets.DB_NAME }} >> .env
