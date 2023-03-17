@@ -57,8 +57,8 @@ class UserViewSet(UserViewSet):
         subscriber = request.user
         target = get_object_or_404(User, pk=id)
         serializer = SubscriptionSerializer(
-                target, data=request.data, context={'request': request}
-            )
+            target, data=request.data, context={'request': request}
+        )
         if request.method == 'POST':
             serializer.is_valid(raise_exception=True)
             Subscription.objects.create(subscriber=subscriber, target=target)
