@@ -9,7 +9,7 @@ services:
       - ./.env
 
   backend:
-    build: ../backend/
+    build: olyakorchagina/foodgram_backend
     restart: always
     volumes:
       - static_value:/app/static/
@@ -21,7 +21,7 @@ services:
 
   frontend:
     build:
-      context: ../frontend
+      context: olyakorchagina/foodgram_frontend
       dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
