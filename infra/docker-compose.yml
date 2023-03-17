@@ -9,7 +9,7 @@ services:
       - ./.env
 
   backend:
-    image: olyakorchagina/foodgram_backend:latest
+    image: olyakorchagina/foodgram_backend
     restart: always
     volumes:
       - static_value:/app/static/
@@ -20,11 +20,11 @@ services:
       - ./.env
 
   frontend:
-    image: olyakorchagina/foodgram_frontend:latest
+    image: olyakorchagina/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
-      - db
+      - backend
 
   nginx:
     image: nginx:1.19.3
@@ -37,7 +37,7 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - backend
+      - frontend
 
 volumes:
   postgres_data:
