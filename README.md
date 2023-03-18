@@ -86,3 +86,8 @@ docker-compose exec backend python manage.py collectstatic --no-input
 
 docker-compose exec backend python manage.py load_data
 ```
+
+6. Остановить приложение:
+```bash
+docker-compose down
+```
