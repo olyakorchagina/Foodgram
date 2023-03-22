@@ -201,7 +201,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 class AddRecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(),
-        source='ingredient')
+        source='ingredient.id')
 
     class Meta:
         model = RecipeIngredient
@@ -234,6 +234,9 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, ingredients):
         ingredients_lst = []
+        if not ingredients:
+            raise serializers.ValidationError(
+                'Отсутствуют ингридиенты')
         for ingredient in ingredients:
             if ingredient['id'] in ingredients_lst:
                 raise serializers.ValidationError(
