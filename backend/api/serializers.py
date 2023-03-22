@@ -235,12 +235,11 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     def validate_ingredients(self, ingredients):
         ingredients_lst = []
         for ingredient in ingredients:
-            ingredient_id = ingredient.get('id')
-            if ingredient_id in ingredients_lst:
+            if ingredient in ingredients_lst:
                 raise serializers.ValidationError(
                     'Ингредиент не должен повторяться.'
                 )
-            ingredients_lst.append(ingredient_id)
+            ingredients_lst.append(ingredient)
             if int(ingredient.get('amount')) < settings.MIN_INGREDIENT_AMOUNT:
                 raise serializers.ValidationError(
                     f'Количество ингредиента не может быть меньше '
