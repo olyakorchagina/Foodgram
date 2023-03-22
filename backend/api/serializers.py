@@ -142,6 +142,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
+        source='ingredient.id',
         queryset=Ingredient.objects.all()
     )
     name = serializers.ReadOnlyField(source='ingredient.name')
@@ -162,7 +163,9 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer(read_only=True)
-    ingredients = RecipeIngredientSerializer(many=True, source='recipes')
+    ingredients = RecipeIngredientSerializer(
+        read_only=True, many=True, source='recipes'
+    )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
@@ -218,16 +221,16 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, ingredients):
         ingredients_list = []
-        for ingredient in ingredients:
-            if ingredient['id'] in ingredients_list:
-                raise serializers.ValidationError(
-                    'Ингридиенты должны быть уникальными')
-            ingredients_list.append(ingredient['id'])
-            if int(ingredient.get('amount')) < settings.MIN_INGREDIENT_AMOUNT:
-                raise serializers.ValidationError(
-                    f'Количество ингредиента не может быть меньше '
-                    f'{settings.MIN_INGREDIENT_AMOUNT}'
-                )
+        # for ingredient in ingredients:
+        #     if ingredient['id'] in ingredients_list:
+        #         raise serializers.ValidationError(
+        #             'Ингридиенты должны быть уникальными')
+        #     ingredients_list.append(ingredient['id'])
+        #     if int(ingredient.get('amount')) < settings.MIN_INGREDIENT_AMOUNT:
+        #         raise serializers.ValidationError(
+        #             f'Количество ингредиента не может быть меньше '
+        #             f'{settings.MIN_INGREDIENT_AMOUNT}'
+        #         )
         return ingredients
 
     def validate_tags(self, tags):
