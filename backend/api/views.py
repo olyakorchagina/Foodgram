@@ -170,8 +170,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         ingredients = RecipeIngredient.objects.filter(
             recipe__shopping_carts__user=request.user
-        ).order_by(
-            'ingredient__name'
+        ).order_by('ingredient__name'
         ).values(
             'ingredient__name',
             'ingredient__measurement_unit'

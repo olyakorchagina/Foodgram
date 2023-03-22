@@ -142,8 +142,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
-        source='ingredient.id',
-        queryset=Ingredient.objects.all()
+        queryset=Ingredient.objects.all(),
+        source='ingredient.id'
     )
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
@@ -198,8 +198,21 @@ class RecipeSerializer(serializers.ModelSerializer):
         return obj.shopping_carts.filter(user=request.user).exists()
 
 
+class AddRecipeIngredientSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all(),
+        source='ingredient')
+
+    class Meta:
+        model = RecipeIngredient
+        fields = (
+            'id',
+            'amount'
+        )
+
+
 class CreateRecipeSerializer(serializers.ModelSerializer):
-    ingredients = RecipeIngredientSerializer(many=True)
+    ingredients = AddRecipeIngredientSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Tag.objects.all()
     )
@@ -220,18 +233,17 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         )
 
     def validate_ingredients(self, ingredients):
-        # ingredients_list = []
+        # ingredients_lst = []
         # for ingredient in ingredients:
-        #     if ingredient['id'] in ingredients_list:
-        #         raise serializers.ValidationError(
-        #             'Ингридиенты должны быть уникальными')
-        #     ingredients_list.append(ingredient['id'])
-        #     if int(ingredient.get(
-        #         'amount')) < settings.MIN_INGREDIENT_AMOUNT:
-        #         raise serializers.ValidationError(
-        #             f'Количество ингредиента не может быть меньше '
-        #             f'{settings.MIN_INGREDIENT_AMOUNT}'
-        #         )
+        #    if ingredient['id'] in ingredients_lst:
+        #        raise serializers.ValidationError(
+        #            'Ингридиенты должны быть уникальными')
+        #    ingredients_lst.append(ingredient['id'])
+        #    if int(ingredient.get('amount')) < settings.MIN_INGREDIENT_AMOUNT:
+        #        raise serializers.ValidationError(
+        #            f'Количество ингредиента не может быть меньше '
+        #            f'{settings.MIN_INGREDIENT_AMOUNT}'
+        #        )
         return ingredients
 
     def validate_tags(self, tags):
@@ -254,7 +266,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         for ingredient_data in ingredients:
             ingredient_list.append(
                 RecipeIngredient(
-                    ingredient=ingredient_data.pop('id'),
+                    ingredient=ingredient_data.pop('ingredient'),
                     amount=ingredient_data.pop('amount'),
                     recipe=recipe,
                 )
@@ -262,7 +274,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         RecipeIngredient.objects.bulk_create(ingredient_list)
 
     def create(self, validated_data):
-        request = self.context.get('request')
+        request = self.context.get('request', None)
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(author=request.user, **validated_data)
